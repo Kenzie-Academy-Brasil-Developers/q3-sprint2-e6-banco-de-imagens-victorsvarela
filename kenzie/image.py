@@ -3,6 +3,7 @@ from flask import send_from_directory, jsonify
 from genericpath import exists
 import os
 import json
+import uuid
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -68,5 +69,34 @@ def download_files(file_name):
     return send_from_directory(
         directory=f"../{files_directory}/{extension_file}/", 
         path=f"{file_name}", 
+        as_attachment=True
+    )
+
+
+def check_if_exist_folder_with_the_extension_name(name_params):
+    exist_folder = os.path.exists(f'./{files_directory}/{name_params}')
+
+    return exist_folder
+
+def check_if_folder_is_empty_the_extension_name(name_params):
+
+    atual_directory = os.walk(f'./{files_directory}/{name_params}')
+
+    for _,_, filenames in atual_directory:
+        if len(filenames) == 0:
+            return True
+
+
+def download_zip_files(name_params):
+    random_id = uuid.uuid4()
+    os.system(f'zip -r /tmp/{random_id} ./{files_directory}/{name_params} -6')
+    
+    print('uuid',random_id)
+
+    print('tem',os.path.exists(f'/tmp/{random_id}.zip'))
+
+    return send_from_directory(
+        directory=f"/tmp", 
+        path=f"{random_id}.zip",
         as_attachment=True
     )
