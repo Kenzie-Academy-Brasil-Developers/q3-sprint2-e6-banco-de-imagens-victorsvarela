@@ -25,6 +25,12 @@ def create_folders():
             print(dirnames)
 
 
+def check_if_the_extension_is_supported_for_upload_files(extension):
+    print('oi', extension)
+    if not extension in allowed_extensions:
+        return True
+
+
 def check_file_name(select_folder, file_name):
     return os.path.isfile(f'./{files_directory}/{select_folder}/{file_name}')
 
@@ -63,14 +69,20 @@ def get_files_by_extensions(items_folder, atual_directory, extension):
 
 
 def download_files(file_name):
+
     print(file_name)
     extension_file = file_name.split('.')[1]
+    
+    if not extension_file in allowed_extensions:
+        return {"status": "error", "message": "not found - extensão não permite"}, 404
+
 
     return send_from_directory(
         directory=f"../{files_directory}/{extension_file}/", 
         path=f"{file_name}", 
         as_attachment=True
-    )
+    ), 200
+
 
 
 def check_if_exist_folder_with_the_extension_name(name_params):
@@ -87,9 +99,9 @@ def check_if_folder_is_empty_the_extension_name(name_params):
             return True
 
 
-def download_zip_files(name_params):
+def download_zip_files(name_params, compression_ratio):
     random_id = uuid.uuid4()
-    os.system(f'zip -r /tmp/{random_id} ./{files_directory}/{name_params} -6')
+    os.system(f'zip -r /tmp/{random_id} ./{files_directory}/{name_params} -{compression_ratio}')
     
     print('uuid',random_id)
 

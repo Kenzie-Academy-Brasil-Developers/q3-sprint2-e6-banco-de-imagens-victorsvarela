@@ -2,7 +2,7 @@ from flask import Flask, request, send_from_directory
 import os
 import json
 from dotenv import load_dotenv
-from kenzie.image import create_folders, check_file_name, save_file_to_memory, get_files, get_files_by_extensions, download_files, check_if_exist_folder_with_the_extension_name, check_if_folder_is_empty_the_extension_name, download_zip_files
+from kenzie.image import create_folders, check_if_the_extension_is_supported_for_upload_files, check_file_name, save_file_to_memory, get_files, get_files_by_extensions, download_files, check_if_exist_folder_with_the_extension_name, check_if_folder_is_empty_the_extension_name, download_zip_files
 
 load_dotenv()
 
@@ -26,9 +26,14 @@ def upload():
     file_name = file.filename
 
     select_folder = file_name.split('.')[1]
+    print(select_folder)
+
+    if check_if_the_extension_is_supported_for_upload_files(select_folder):
+        return {"status": "error", "message": "unsupported extension"}, 415
 
     if check_file_name(select_folder, file_name):
         return {"status": "conflict", "message": "already have a file with that name"}, 409
+    
     
     save_file_to_memory(select_folder, file)
     
@@ -57,12 +62,14 @@ def get_the_files_by_extensions(extension):
 
 @app.get('/download/<string:file_name>')
 def download(file_name):
-    return download_files(file_name), 200
+    return download_files(file_name)
 
 
 @app.get('/download-zip')
 def download_zip():
     name_params = request.args.get('extension')
+
+    compression_ratio = 6
 
     if not check_if_exist_folder_with_the_extension_name(name_params):
         return {"status": "error", "message": "not found"}, 404
@@ -70,6 +77,6 @@ def download_zip():
     if check_if_folder_is_empty_the_extension_name(name_params):
         return {"status": "error", "message": "not found"}, 404
 
-    return download_zip_files(name_params), 200
+    return download_zip_files(name_params, compression_ratio), 200
 
     
