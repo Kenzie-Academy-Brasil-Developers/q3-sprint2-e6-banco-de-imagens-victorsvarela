@@ -105,7 +105,7 @@ def download_zip_files(name_params, compression_ratio):
     
     print('uuid',random_id)
 
-    print('tem',os.path.exists(f'/tmp/{random_id}.zip'))
+    print('tem',compression_ratio)
 
     return send_from_directory(
         directory=f"/tmp", 

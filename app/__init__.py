@@ -69,7 +69,7 @@ def download(file_name):
 def download_zip():
     name_params = request.args.get('extension')
 
-    compression_ratio = 6
+    compression_ratio = request.args.get('compression_ratio')
 
     if not check_if_exist_folder_with_the_extension_name(name_params):
         return {"status": "error", "message": "not found"}, 404
